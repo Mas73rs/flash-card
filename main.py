@@ -1,2 +1,11 @@
+from tkinter import *
+
 BACKGROUND_COLOR = "#B1DDC6"
 
+window = Tk()
+window.title('Flashy')
+
+# -------------------- UI SETUP --------------------
+my_image = PhotoImage(file='./')
+
+window.mainloop()
