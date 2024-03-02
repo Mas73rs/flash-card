@@ -3,11 +3,17 @@ import pandas as pd
 import random as rd
 
 BACKGROUND_COLOR = "#B1DDC6"
+current_card = {}
+to_learn = {}
 
 # Load the CSV data
-data = pd.read_csv('./data/french_words.csv')
-to_learn = data.to_dict(orient='records')
-current_card = {}
+try:
+    data = pd.read_csv('./data/words_to_learn.csv')
+except FileNotFoundError:
+    data = pd.read_csv('./data/french_words.csv')
+    to_learn = data.to_dict(orient='records')
+else:
+    to_learn = data.to_dict(orient='records')
 
 
 # -------------------- NEXT CARD -------------------
@@ -25,6 +31,7 @@ def next_card():
     # Flip card
     flip_timer = window.after(3000, func=flip_card)
 
+
 # -------------------- FLIP CARD -------------------
 def flip_card():
     language = data.columns[1]  # English
@@ -35,6 +42,16 @@ def flip_card():
     canvas.itemconfig(card_word, text=word, fill='white')
     # Change color
     canvas.itemconfig(card_background, image=card_back_img)
+
+
+# -------------------- FLIP CARD -------------------
+def is_known():
+    to_learn.remove(current_card)
+    data = pd.DataFrame(to_learn)
+    data.to_csv('./data/words_to_learn.csv', index=False)
+
+    next_card()
+
 
 # -------------------- UI SETUP --------------------
 
@@ -65,11 +82,10 @@ canvas.grid(row=0, column=0, columnspan=2)
 # Add buttons
 unknown_button = Button(image=cross_img, highlightbackground=BACKGROUND_COLOR, command=next_card)
 unknown_button.grid(row=1, column=0)  # Red button
-known_button = Button(image=check_img, highlightbackground=BACKGROUND_COLOR, command=next_card)
+known_button = Button(image=check_img, highlightbackground=BACKGROUND_COLOR, command=is_known)
 known_button.grid(row=1, column=1)  # Green button
 
 # Pick a random card
 next_card()
-
 
 window.mainloop()
